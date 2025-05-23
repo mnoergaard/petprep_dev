@@ -38,6 +38,11 @@ Command-Line Arguments
    :nodefault:
    :nodefaultconst:
 
+The ``--reference-frame`` option selects a specific frame of the PET
+time series to generate the motion-correction reference. Use ``--reference-frame
+<index>`` to pick a particular frame or ``--reference-frame average`` (default)
+to compute a robust average across frames.
+
 
 The command-line interface of the docker wrapper
 ------------------------------------------------
