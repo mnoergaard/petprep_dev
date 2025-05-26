@@ -1,12 +1,12 @@
-The *PETPrep* on Docker wrapper
---------------------------------
+The ``petprep-docker`` wrapper
+------------------------------
 PETPrep is a positron emission tomography data preprocessing pipeline
 that is designed to provide an easily accessible, state-of-the-art interface
 that is robust to differences in scan acquisition protocols and that requires
 minimal user input, while providing easily interpretable and comprehensive
 error and output reporting.
 
-This is a lightweight Python wrapper to run *PETPrep*.
+This is a lightweight Python wrapper (``petprep-docker``) to run *PETPrep*.
 It generates the appropriate Docker commands, providing an intuitive interface
 to running the *PETPrep* workflow in a Docker environment.
 Docker must be installed and running. This can be checked

@@ -137,8 +137,8 @@ def merge_help(wrapper_help, target_help):
         """
         Extract positional arguments from usage string.
 
-        This function can be used by both native fmriprep (`fmriprep -h`)
-        and the docker wrapper (`fmriprep-docker -h`).
+        This function can be used by both native petprep (`petprep -h`)
+        and the docker wrapper (`petprep-docker -h`).
         """
         posargs = []
         for targ in usage.split('\n')[-3:]:
