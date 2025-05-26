@@ -3,7 +3,7 @@
 Standalone script to facilitate caching of required TemplateFlow templates.
 
 To download and view how to use this script, run the following commands inside a terminal:
-1. wget https://raw.githubusercontent.com/nipreps/fmriprep/master/scripts/fetch_templates.py
+1. wget https://raw.githubusercontent.com/nipreps/petprep/master/scripts/fetch_templates.py
 2. python fetch_templates.py -h
 """
 
@@ -22,7 +22,7 @@ def fetch_MNI2009():
     tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-01_desc-brain_mask.nii.gz
     tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-02_desc-brain_mask.nii.gz
     tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-01_desc-carpet_dseg.nii.gz
-    tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-02_desc-fMRIPrep_boldref.nii.gz
+    tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-02_desc-PETPrep_boldref.nii.gz
     tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-01_label-brain_probseg.nii.gz
     """
     template = 'MNI152NLin2009cAsym'
@@ -30,7 +30,7 @@ def fetch_MNI2009():
     tf.get(template, resolution=(1, 2), desc=None, suffix=['T1w', 'T2w'])
     tf.get(template, resolution=(1, 2), desc='brain', suffix='mask')
     tf.get(template, resolution=1, atlas=None, desc='carpet', suffix='dseg')
-    tf.get(template, resolution=2, desc='fMRIPrep', suffix='boldref')
+    tf.get(template, resolution=2, desc='PETPrep', suffix='boldref')
     tf.get(template, resolution=1, label='brain', suffix='probseg')
 
 
@@ -119,7 +119,7 @@ def fetch_all():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description='Helper script for pre-caching required templates to run fMRIPrep',
+        description='Helper script for pre-caching required templates to run PETPrep',
     )
     parser.add_argument(
         '--tf-dir',
