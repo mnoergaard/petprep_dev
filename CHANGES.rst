@@ -8,11 +8,11 @@ Note that derivatives from previous versions will be accepted,
 so it should not be necessary to recompute derivatives from previous versions.
 The recommended command line is::
 
-    fmriprep BIDS_DIR OUT_DIR participant --derivatives fmriprep=PRECOMP_DIR
+    petprep BIDS_DIR OUT_DIR participant --derivatives petprep=PRECOMP_DIR
 
 Note that multiple derivatives can be specified, for example::
 
-    fmriprep BIDS_DIR OUT_DIR participant \
+    petprep BIDS_DIR OUT_DIR participant \
       anat=PRECOMPUTED_ANATOMICAL_DIR \
       func=PRECOMPUTED_FUNCTIONAL_DIR
 
