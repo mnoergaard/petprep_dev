@@ -1,13 +1,13 @@
 .PHONY: help docker-build
 .DEFAULT: help
 
-tag="fmriprep"
+tag="petprep"
 
 help:
 	@echo "Premade recipes"
 	@echo
 	@echo "make docker-build [tag=TAG]"
-	@echo "\tBuilds a docker image from source. Defaults to 'fmriprep' tag."
+@echo "\tBuilds a docker image from source. Defaults to 'petprep' tag."
 
 
 docker-build:

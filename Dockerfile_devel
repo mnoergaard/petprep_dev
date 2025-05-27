@@ -78,7 +78,7 @@ RUN /src/codeserver/code-server --install-extension eamodio.gitlens &&\
     /src/codeserver/code-server --install-extension ms-python.python
 
 
-ENTRYPOINT ["/src/codeserver/code-server", "--auth", "none", "/src/fmriprep"]
+ENTRYPOINT ["/opt/conda/envs/petprep/bin/petprep"]
 
 # usage example (assuming in local fmriprep directory):
 #
