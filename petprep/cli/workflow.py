@@ -139,6 +139,15 @@ def build_workflow(config_file, retval):
             )
             retval['workflow'].add_nodes([pvc_wf])
 
+    if config.workflow.generate_seg:
+        try:
+            from ..workflows.pet import init_pet_gtmseg_wf
+        except Exception as exc:
+            build_log.warning('Segmentation workflow unavailable: %s', exc)
+        else:
+            seg_wf = init_pet_gtmseg_wf()
+            retval['workflow'].add_nodes([seg_wf])
+
     # Check for FS license after building the workflow
     if not check_valid_fs_license():
         from ..utils.misc import fips_enabled

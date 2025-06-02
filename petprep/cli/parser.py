@@ -572,6 +572,13 @@ https://petprep.readthedocs.io/en/%s/spaces.html"""
         default=None,
         help='Point-spread function full-width at half-maximum in mm',
     )
+    g_pvc.add_argument(
+        '--seg',
+        action='store_true',
+        dest='generate_seg',
+        default=False,
+        help='Generate GTM segmentation for partial volume correction',
+    )
 
     g_carbon = parser.add_argument_group('Options for carbon usage tracking')
     g_carbon.add_argument(
