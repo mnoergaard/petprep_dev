@@ -603,6 +603,9 @@ class workflow(_Config):
     psf: list[float] | None = None
     """Point-spread function (FWHM) of the acquisition as ``[x, y, z]``."""
 
+    generate_seg = False
+    """Run workflow to generate GTM segmentation."""
+
 
 class loggers:
     """Keep loggers easily accessible (see :py:func:`init`)."""
