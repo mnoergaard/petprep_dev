@@ -3,6 +3,7 @@
 from niworkflows.interfaces.bids import DerivativesDataSink as _DDSink
 
 from .cifti import GeneratePetCifti
+from .gtmseg import GTMSeg
 from .pvc import PETPVC, PVCMake4D
 
 
@@ -15,4 +16,5 @@ __all__ = (
     'GeneratePetCifti',
     'PETPVC',
     'PVCMake4D',
+    'GTMSeg',
 )
