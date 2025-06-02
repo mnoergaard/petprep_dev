@@ -45,6 +45,7 @@ from .fit import init_pet_fit_wf, init_pet_native_wf
 from .outputs import (
     init_ds_pet_native_wf,
     init_ds_volumes_wf,
+    init_ds_pet_pvc_wf,
     prepare_timing_parameters,
 )
 from .pvc import init_pet_pvc_wf
@@ -353,6 +354,20 @@ configured with cubic B-spline interpolation.
         ]),
         (pet_fit_wf, pet_pvc_wf, [
             ('outputnode.petref2anat_xfm', 'inputnode.petref2anat_xfm'),
+        ]),
+    ])  # fmt:skip
+
+    ds_pet_pvc_wf = init_ds_pet_pvc_wf(
+        bids_root=str(config.execution.bids_dir),
+        output_dir=petprep_dir,
+        metadata=all_metadata[0],
+        name='ds_pet_pvc_wf',
+    )
+    ds_pet_pvc_wf.inputs.inputnode.source_files = pet_file
+    workflow.connect([
+        (pet_pvc_wf, ds_pet_pvc_wf, [
+            ('outputnode.pet_pvc', 'inputnode.pet_pvc'),
+            ('outputnode.tac_file', 'inputnode.tac_file'),
         ]),
     ])  # fmt:skip
 
