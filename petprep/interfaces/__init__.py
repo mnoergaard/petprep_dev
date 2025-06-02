@@ -3,6 +3,8 @@
 from niworkflows.interfaces.bids import DerivativesDataSink as _DDSink
 
 from .cifti import GeneratePetCifti
+from .pvc import PETPVC, PVCMake4D
+
 
 class DerivativesDataSink(_DDSink):
     out_path_base = ''
@@ -11,4 +13,6 @@ class DerivativesDataSink(_DDSink):
 __all__ = (
     'DerivativesDataSink',
     'GeneratePetCifti',
+    'PETPVC',
+    'PVCMake4D',
 )
