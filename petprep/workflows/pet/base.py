@@ -47,6 +47,7 @@ from .outputs import (
     init_ds_volumes_wf,
     prepare_timing_parameters,
 )
+from .pvc import init_pet_pvc_wf
 from .resampling import init_pet_surf_wf
 
 
@@ -214,6 +215,9 @@ configured with cubic B-spline interpolation.
                 'mni6_mask',
                 # MNI152NLin2009cAsym inverse warp, for carpetplotting
                 'mni2009c2anat_xfm',
+                # Partial volume correction
+                'pvc_method',
+                'psf',
             ],
         ),
         name='inputnode',
@@ -338,6 +342,19 @@ configured with cubic B-spline interpolation.
                 ('outputnode.resampling_reference', 'inputnode.ref_file'),
             ]),
         ])  # fmt:skip
+
+    pet_pvc_wf = init_pet_pvc_wf()
+    workflow.connect([
+        (pet_anat_wf, pet_pvc_wf, [('outputnode.pet_file', 'inputnode.pet_t1w')]),
+        (inputnode, pet_pvc_wf, [
+            ('t1w_dseg', 'inputnode.t1w_dseg'),
+            ('pvc_method', 'inputnode.pvc_method'),
+            ('psf', 'inputnode.psf'),
+        ]),
+        (pet_fit_wf, pet_pvc_wf, [
+            ('outputnode.petref2anat_xfm', 'inputnode.petref2anat_xfm'),
+        ]),
+    ])  # fmt:skip
 
     if spaces.cached.get_spaces(nonstandard=False, dim=(3,)):
         # Missing:
