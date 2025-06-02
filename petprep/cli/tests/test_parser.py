@@ -245,6 +245,31 @@ def test_derivatives(tmp_path):
         parser.parse_args(temp_args)
     _reset_config()
 
+
+def test_pvc_cli_args(tmp_path, minimal_bids):
+    """Check parser handling of PVC options."""
+    out_dir = tmp_path / 'out'
+    work_dir = tmp_path / 'work'
+
+    opts = parse_args(
+        args=[
+            str(minimal_bids),
+            str(out_dir),
+            'participant',
+            '-w',
+            str(work_dir),
+            '--skip-bids-validation',
+            '--pvc-method', 'GTM',
+            '--psf', '1', '2', '3',
+        ]
+    )
+
+    assert opts.pvc_method == 'GTM'
+    assert opts.psf == [1.0, 2.0, 3.0]
+    assert config.workflow.pvc_method == 'GTM'
+    assert config.workflow.psf == [1.0, 2.0, 3.0]
+    _reset_config()
+
     # Providing --derivatives without names should automatically label them
     temp_args = args + ['--derivatives', str(bids_path / 'derivatives/smriprep')]
     opts = parser.parse_args(temp_args)
