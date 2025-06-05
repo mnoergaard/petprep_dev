@@ -41,7 +41,8 @@ def _build_parser(**kwargs):
 
     from .version import check_latest, is_flagged
 
-    deprecations = {}
+    deprecations = {
+    }
 
     class DeprecatedAction(Action):
         def __call__(self, parser, namespace, values, option_string=None):
@@ -150,7 +151,9 @@ def _build_parser(**kwargs):
         try:
             return int(value)
         except ValueError:
-            raise parser.error("Reference frame must be an integer index or 'average'.") from None
+            raise parser.error(
+                "Reference frame must be an integer index or 'average'."
+            ) from None
 
     verstr = f'PETPrep v{config.environment.version}'
     currentv = Version(config.environment.version)
@@ -391,7 +394,7 @@ https://petprep.readthedocs.io/en/%s/spaces.html"""
         type=ReferenceFrame,
         default='average',
         help=(
-            'Reference frame index (0-based) for PET preprocessing. '
+            "Reference frame index (0-based) for PET preprocessing. "
             "Use 'average' to compute the standard averaged reference."
         ),
     )
@@ -555,22 +558,6 @@ https://petprep.readthedocs.io/en/%s/spaces.html"""
         dest='fs_no_resume',
         help='EXPERT: Import pre-computed FreeSurfer reconstruction without resuming. '
         'The user is responsible for ensuring that all necessary files are present.',
-    )
-
-    g_pvc = parser.add_argument_group('Options for partial volume correction')
-    g_pvc.add_argument(
-        '--pvc-method',
-        action='store',
-        default=None,
-        help='Partial volume correction method to apply',
-    )
-    g_pvc.add_argument(
-        '--psf',
-        nargs=3,
-        metavar=('X', 'Y', 'Z'),
-        type=float,
-        default=None,
-        help='Point-spread function full-width at half-maximum in mm',
     )
 
     g_carbon = parser.add_argument_group('Options for carbon usage tracking')

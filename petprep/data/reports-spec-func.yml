@@ -1,5 +1,5 @@
-package: petprep
-title: Functional report for participant '{subject}', session '{session}' - PETPrep
+package: fmriprep
+title: Functional report for participant '{subject}', session '{session}' - fMRIPrep
 sections:
 - name: Functional
   ordering: session,task,acquisition,ceagent,reconstruction,direction,run,echo

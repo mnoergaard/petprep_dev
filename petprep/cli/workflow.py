@@ -86,9 +86,7 @@ def build_workflow(config_file, retval):
     if config.execution.reports_only:
         build_log.log(25, 'Running --reports-only on participants %s', ', '.join(subject_list))
         session_list = (
-            config.execution.bids_filters.get(
-                'pet', config.execution.bids_filters.get('bold', {})
-            ).get('session')
+            config.execution.bids_filters.get('pet', config.execution.bids_filters.get('bold', {})).get('session')
             if config.execution.bids_filters
             else None
         )
@@ -126,18 +124,6 @@ def build_workflow(config_file, retval):
     build_log.log(25, f'\n{" " * 11}* '.join(init_msg))
 
     retval['workflow'] = init_petprep_wf()
-
-    if config.workflow.pvc_method:
-        try:
-            from ..workflows.pet.pvc import init_pet_pvc_wf
-        except Exception as exc:
-            build_log.warning('Partial volume correction workflow unavailable: %s', exc)
-        else:
-            pvc_wf = init_pet_pvc_wf(
-                pvc_method=config.workflow.pvc_method,
-                psf=config.workflow.psf,
-            )
-            retval['workflow'].add_nodes([pvc_wf])
 
     # Check for FS license after building the workflow
     if not check_valid_fs_license():

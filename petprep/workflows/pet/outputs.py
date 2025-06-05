@@ -749,63 +749,6 @@ def init_ds_volumes_wf(
     return workflow
 
 
-def init_ds_pet_pvc_wf(*, bids_root: str, output_dir: str, metadata: dict, name='ds_pet_pvc_wf') -> pe.Workflow:
-    """Write out partial volume corrected PET and TAC file."""
-
-    timing_parameters = prepare_timing_parameters(metadata)
-
-    workflow = pe.Workflow(name=name)
-    inputnode = pe.Node(
-        niu.IdentityInterface(fields=['source_files', 'pet_pvc', 'tac_file']),
-        name='inputnode',
-    )
-    outputnode = pe.Node(
-        niu.IdentityInterface(fields=['pet_pvc', 'tac_file']), name='outputnode'
-    )
-
-    sources = pe.Node(
-        BIDSURI(numinputs=1, dataset_links=config.execution.dataset_links, out_dir=str(output_dir)),
-        name='sources',
-    )
-
-    ds_pet_pvc = pe.Node(
-        DerivativesDataSink(
-            base_directory=output_dir,
-            desc='pvc',
-            datatype='pet',
-            compress=True,
-            TaskName=metadata.get('TaskName'),
-            **timing_parameters,
-        ),
-        name='ds_pet_pvc',
-        mem_gb=DEFAULT_MEMORY_MIN_GB,
-    )
-
-    ds_tac = pe.Node(
-        DerivativesDataSink(
-            base_directory=output_dir,
-            desc='pvc',
-            datatype='pet',
-            suffix='tac',
-            extension='.tsv',
-        ),
-        name='ds_tac',
-        run_without_submitting=True,
-    )
-
-    workflow.connect([
-        (inputnode, sources, [('source_files', 'in1')]),
-        (inputnode, ds_pet_pvc, [('pet_pvc', 'in_file'), ('source_files', 'source_file')]),
-        (inputnode, ds_tac, [('tac_file', 'in_file'), ('source_files', 'source_file')]),
-        (sources, ds_pet_pvc, [('out', 'Sources')]),
-        (sources, ds_tac, [('out', 'Sources')]),
-        (ds_pet_pvc, outputnode, [('out_file', 'pet_pvc')]),
-        (ds_tac, outputnode, [('out_file', 'tac_file')]),
-    ])  # fmt:skip
-
-    return workflow
-
-
 def init_pet_preproc_report_wf(
     mem_gb: float,
     reportlets_dir: str,

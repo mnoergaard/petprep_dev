@@ -11,7 +11,6 @@ from ..outputs import (
     init_ds_petmask_wf,
     init_ds_pet_native_wf,
     init_ds_volumes_wf,
-    init_ds_pet_pvc_wf,
 )
 
 
@@ -47,10 +46,3 @@ def test_datasink_datatype(tmp_path: Path):
         assert wf.get_node("ds_pet").inputs.datatype == "pet"
         assert wf.get_node("ds_ref").inputs.datatype == "pet"
         assert wf.get_node("ds_mask").inputs.datatype == "pet"
-        wf = init_ds_pet_pvc_wf(
-            bids_root=bids_dir,
-            output_dir=out_dir,
-            metadata={},
-        )
-        assert wf.get_node("ds_pet_pvc").inputs.datatype == "pet"
-        assert wf.get_node("ds_tac").inputs.datatype == "pet"

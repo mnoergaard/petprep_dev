@@ -1,4 +1,4 @@
-package: petprep
+package: fmriprep
 title: Visual report for participant '{subject}' - PETPrep
 sections:
 - name: Summary
@@ -144,7 +144,7 @@ sections:
   - bids: {datatype: figures, desc: about, suffix: T1w}
   - custom: boilerplate
     path: '{out_dir}/logs'
-    bibfile: ['petprep', 'data/boilerplate.bib']
+    bibfile: ['fmriprep', 'data/boilerplate.bib']
     caption: |
       <p>We kindly ask to report results preprocessed with this tool using the following boilerplate.</p>
       <p class="alert alert-info" role="alert">

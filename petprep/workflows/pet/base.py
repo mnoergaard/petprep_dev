@@ -45,10 +45,8 @@ from .fit import init_pet_fit_wf, init_pet_native_wf
 from .outputs import (
     init_ds_pet_native_wf,
     init_ds_volumes_wf,
-    init_ds_pet_pvc_wf,
     prepare_timing_parameters,
 )
-from .pvc import init_pet_pvc_wf
 from .resampling import init_pet_surf_wf
 
 
@@ -77,7 +75,7 @@ def init_pet_wf(
 
     Parameters
     ----------
-    pet_file
+    pet_series
         List of paths to NIfTI files.
     precomputed
         Dictionary containing precomputed derivatives to reuse, if possible.
@@ -152,14 +150,14 @@ def init_pet_wf(
 
     if precomputed is None:
         precomputed = {}
-    pet_file = pet_series
+    pet_file = pet_series[0]
 
     petprep_dir = config.execution.petprep_dir
     omp_nthreads = config.nipype.omp_nthreads
     all_metadata = [config.execution.layout.get_metadata(file) for file in pet_series]
 
     nvols, mem_gb = estimate_pet_mem_usage(pet_file)
-    if nvols <= 5 - config.execution.sloppy:
+    if nvols <= 1 - config.execution.sloppy:
         config.loggers.workflow.warning(
             f'Too short PET series (<= 5 timepoints). Skipping processing of <{pet_file}>.'
         )
@@ -216,9 +214,6 @@ configured with cubic B-spline interpolation.
                 'mni6_mask',
                 # MNI152NLin2009cAsym inverse warp, for carpetplotting
                 'mni2009c2anat_xfm',
-                # Partial volume correction
-                'pvc_method',
-                'psf',
             ],
         ),
         name='inputnode',
@@ -229,7 +224,7 @@ configured with cubic B-spline interpolation.
     #
 
     pet_fit_wf = init_pet_fit_wf(
-        pet_file=pet_file,
+        pet_series=pet_series,
         precomputed=precomputed,
         omp_nthreads=omp_nthreads,
     )
@@ -259,7 +254,7 @@ configured with cubic B-spline interpolation.
     #
 
     pet_native_wf = init_pet_native_wf(
-        pet_file=pet_file,
+        pet_series=pet_series,
         omp_nthreads=omp_nthreads,
     )
 
@@ -344,33 +339,6 @@ configured with cubic B-spline interpolation.
             ]),
         ])  # fmt:skip
 
-    pet_pvc_wf = init_pet_pvc_wf()
-    workflow.connect([
-        (pet_anat_wf, pet_pvc_wf, [('outputnode.pet_file', 'inputnode.pet_t1w')]),
-        (inputnode, pet_pvc_wf, [
-            ('t1w_dseg', 'inputnode.t1w_dseg'),
-            ('pvc_method', 'inputnode.pvc_method'),
-            ('psf', 'inputnode.psf'),
-        ]),
-        (pet_fit_wf, pet_pvc_wf, [
-            ('outputnode.petref2anat_xfm', 'inputnode.petref2anat_xfm'),
-        ]),
-    ])  # fmt:skip
-
-    ds_pet_pvc_wf = init_ds_pet_pvc_wf(
-        bids_root=str(config.execution.bids_dir),
-        output_dir=petprep_dir,
-        metadata=all_metadata[0],
-        name='ds_pet_pvc_wf',
-    )
-    ds_pet_pvc_wf.inputs.inputnode.source_files = pet_file
-    workflow.connect([
-        (pet_pvc_wf, ds_pet_pvc_wf, [
-            ('outputnode.pet_pvc', 'inputnode.pet_pvc'),
-            ('outputnode.tac_file', 'inputnode.tac_file'),
-        ]),
-    ])  # fmt:skip
-
     if spaces.cached.get_spaces(nonstandard=False, dim=(3,)):
         # Missing:
         #  * Clipping PET after resampling
@@ -386,7 +354,7 @@ configured with cubic B-spline interpolation.
             metadata=all_metadata[0],
             name='ds_pet_std_wf',
         )
-        ds_pet_std_wf.inputs.inputnode.source_files = pet_file
+        ds_pet_std_wf.inputs.inputnode.source_files = pet_series
 
         workflow.connect([
             (inputnode, pet_std_wf, [

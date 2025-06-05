@@ -115,9 +115,9 @@ def test_get_parser_update(monkeypatch, capsys, current, latest):
     captured = capsys.readouterr().err
 
     msg = f"""\
-You are using fMRIPrep-{current}, and a newer version of fMRIPrep is available: {latest}.
+You are using PETPrep-{current}, and a newer version of PETPrep is available: {latest}.
 Please check out our documentation about how and when to upgrade:
-https://fmriprep.readthedocs.io/en/latest/faq.html#upgrading"""
+https://petprep.readthedocs.io/en/latest/faq.html#upgrading"""
 
     assert (msg in captured) is expectation
 
@@ -184,52 +184,6 @@ def test_bids_filter_file(tmp_path, capsys):
     _reset_config()
 
 
-@pytest.mark.parametrize('st_ref', (None, '0', '1', '0.5', 'start', 'middle'))  # noqa: PT007
-def test_slice_time_ref(tmp_path, st_ref):
-    bids_path = tmp_path / 'data'
-    out_path = tmp_path / 'out'
-    args = [str(bids_path), str(out_path), 'participant']
-    if st_ref:
-        args.extend(['--slice-time-ref', st_ref])
-    bids_path.mkdir()
-
-    parser = _build_parser()
-
-    parser.parse_args(args)
-    _reset_config()
-
-
-@pytest.mark.parametrize(
-    ('args', 'expectation'),
-    [
-        ([], False),
-        (['--use-syn-sdc'], 'error'),
-        (['--use-syn-sdc', 'error'], 'error'),
-        (['--use-syn-sdc', 'warn'], 'warn'),
-        (['--use-syn-sdc', 'other'], (SystemExit, ArgumentError)),
-    ],
-)
-def test_use_syn_sdc(tmp_path, args, expectation):
-    bids_path = tmp_path / 'data'
-    out_path = tmp_path / 'out'
-    args = [str(bids_path), str(out_path), 'participant'] + args
-    bids_path.mkdir()
-
-    parser = _build_parser()
-
-    cm = nullcontext()
-    if isinstance(expectation, tuple):
-        cm = pytest.raises(expectation)
-
-    with cm:
-        opts = parser.parse_args(args)
-
-    if not isinstance(expectation, tuple):
-        assert opts.use_syn_sdc == expectation
-
-    _reset_config()
-
-
 def test_derivatives(tmp_path):
     """Check the correct parsing of the derivatives argument."""
     bids_path = tmp_path / 'data'
@@ -243,31 +197,6 @@ def test_derivatives(tmp_path):
     temp_args = args + ['--derivatives']
     with pytest.raises((SystemExit, ArgumentError)):
         parser.parse_args(temp_args)
-    _reset_config()
-
-
-def test_pvc_cli_args(tmp_path, minimal_bids):
-    """Check parser handling of PVC options."""
-    out_dir = tmp_path / 'out'
-    work_dir = tmp_path / 'work'
-
-    opts = parse_args(
-        args=[
-            str(minimal_bids),
-            str(out_dir),
-            'participant',
-            '-w',
-            str(work_dir),
-            '--skip-bids-validation',
-            '--pvc-method', 'GTM',
-            '--psf', '1', '2', '3',
-        ]
-    )
-
-    assert opts.pvc_method == 'GTM'
-    assert opts.psf == [1.0, 2.0, 3.0]
-    assert config.workflow.pvc_method == 'GTM'
-    assert config.workflow.psf == [1.0, 2.0, 3.0]
     _reset_config()
 
     # Providing --derivatives without names should automatically label them
