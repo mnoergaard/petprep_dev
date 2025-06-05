@@ -25,7 +25,7 @@ import numpy as np
 from nipype.interfaces import utility as niu
 from nipype.pipeline import engine as pe
 from niworkflows.interfaces.header import ValidateImage
-
+from niworkflows.utils.connections import listify
 
 from ... import config
 from ...interfaces.reports import FunctionalSummary
@@ -126,6 +126,7 @@ def init_pet_fit_wf(
 
     if precomputed is None:
         precomputed = {}
+    pet_series = listify(pet_series)
     layout = config.execution.layout
 
     pet_file = pet_series[0]
@@ -192,11 +193,6 @@ def init_pet_fit_wf(
         config.loggers.workflow.debug('Reusing motion correction transforms: %s', hmc_xforms)
 
     timing_parameters = prepare_timing_parameters(metadata)
-    tr = timing_parameters.get('RepetitionTime')
-    if tr is None and 'VolumeTiming' in timing_parameters:
-        vt = timing_parameters['VolumeTiming']
-        if len(vt) > 1 and np.allclose(np.diff(vt), np.diff(vt)[0]):
-            tr = float(np.diff(vt)[0])
 
     summary = pe.Node(
         FunctionalSummary(
@@ -458,6 +454,7 @@ def init_pet_native_wf(
     """
 
     layout = config.execution.layout
+    pet_series = listify(pet_series)
 
     all_metadata = [layout.get_metadata(pet_file) for pet_file in pet_series]
 
