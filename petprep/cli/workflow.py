@@ -139,6 +139,24 @@ def build_workflow(config_file, retval):
             )
             retval['workflow'].add_nodes([pvc_wf])
 
+    if config.workflow.segmentation:
+        try:
+            from ..workflows.pet.segmentation import init_pet_segmentation_wf
+            from ..workflows.base import _prefix
+        except Exception as exc:
+            build_log.warning('Segmentation workflow unavailable: %s', exc)
+        else:
+            seg_wfs = []
+            for sid in config.execution.participant_label:
+                seg_wf = init_pet_segmentation_wf(
+                    config.workflow.segmentation,
+                    name=f'sub_{_prefix(sid)}_seg_wf',
+                )
+                seg_wf.inputs.inputnode.subjects_dir = str(config.execution.fs_subjects_dir)
+                seg_wf.inputs.inputnode.subject_id = _prefix(sid)
+                seg_wfs.append(seg_wf)
+            retval['workflow'].add_nodes(seg_wfs)
+
     # Check for FS license after building the workflow
     if not check_valid_fs_license():
         from ..utils.misc import fips_enabled

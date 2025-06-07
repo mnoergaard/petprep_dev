@@ -270,6 +270,26 @@ def test_pvc_cli_args(tmp_path, minimal_bids):
     assert config.workflow.psf == [1.0, 2.0, 3.0]
     _reset_config()
 
+
+def test_segmentation_cli_args(tmp_path, minimal_bids):
+    out_dir = tmp_path / 'out'
+    work_dir = tmp_path / 'work'
+
+    opts = parse_args(
+        args=[
+            str(minimal_bids),
+            str(out_dir),
+            'participant',
+            '-w', str(work_dir),
+            '--skip-bids-validation',
+            '--segmentation', 'gtm', 'brainstem',
+        ]
+    )
+
+    assert opts.segmentation == ['gtm', 'brainstem']
+    assert config.workflow.segmentation == ['gtm', 'brainstem']
+    _reset_config()
+
     # Providing --derivatives without names should automatically label them
     temp_args = args + ['--derivatives', str(bids_path / 'derivatives/smriprep')]
     opts = parser.parse_args(temp_args)

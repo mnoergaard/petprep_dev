@@ -573,6 +573,15 @@ https://petprep.readthedocs.io/en/%s/spaces.html"""
         help='Point-spread function full-width at half-maximum in mm',
     )
 
+    g_seg = parser.add_argument_group('Options for segmentation')
+    g_seg.add_argument(
+        '--segmentation',
+        nargs='+',
+        choices=['gtm', 'brainstem', 'thalamicNuclei', 'hippocampusAmygdala', 'wm', 'raphe', 'limbic'],
+        default=[],
+        help='Segmentation modules to run',
+    )
+
     g_carbon = parser.add_argument_group('Options for carbon usage tracking')
     g_carbon.add_argument(
         '--track-carbon',
