@@ -53,6 +53,7 @@ This tool allows you to easily do the following:
 - Register data within and across subjects, and to template spaces.
 - Perform partial volume correction.
 - Extract time activity curves for pharmacokinetic modelling.
+- Optionally fit kinetic models when modeled blood data are available.
 - Implement tools from different software packages.
 - Achieve optimal data processing quality by using the best tools available.
 - Generate preprocessing quality reports, with which the user can easily
@@ -65,6 +66,7 @@ This tool allows you to easily do the following:
 PETPrep also extracts regional time-activity curves as tabular files with frame
 timings and uptake values. These tables can be fed directly into
 pharmacokinetic modeling tools such as kinfitr_ or PMOD_ to estimate tracer kinetics or compute binding estimates.
+Kinetic modeling can be invoked directly from PETPrep using the ``--model`` command-line option when matching blood data are present.
 
 More information and documentation can be found at
 https://petprep.readthedocs.io/

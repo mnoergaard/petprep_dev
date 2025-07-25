@@ -274,3 +274,21 @@ def test_psf_metadata_propagation(bids_root: Path):
         wf.get_node('ds_pet_t1_wf.psf_meta'), wf.get_node('ds_pet_t1_wf.ds_pet')
     )
     assert ('meta_dict', 'meta_dict') in edge_ds['connect']
+
+
+def test_pet_wf_with_kinmod(bids_root: Path):
+    """Kinetic modeling workflow is added when models are requested."""
+    pet_series = _prep_pet_series(bids_root)
+
+    blood_root = data.load("tests/ds000005/derivatives/bloodstream").absolute()
+
+    with mock_config(bids_dir=bids_root):
+        config.workflow.models = ["logan"]
+        config.execution.derivatives = {"bloodstream": blood_root}
+        wf = init_pet_wf(pet_series=pet_series, precomputed={})
+
+    assert any(n.startswith("pet_kinmod_wf") for n in wf.list_node_names())
+    edge = wf._graph.get_edge_data(
+        wf.get_node("pet_tacs_wf"), wf.get_node("pet_kinmod_wf")
+    )
+    assert ("outputnode.timeseries", "inputnode.tacs_file") in edge["connect"]

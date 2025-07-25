@@ -603,6 +603,44 @@ https://petprep.readthedocs.io/en/%s/spaces.html"""
         help='Point spread function FWHM (one value or three values)',
     )
 
+    g_kin = parser.add_argument_group("Kinetic modeling options")
+    g_kin.add_argument(
+        "--model",
+        nargs="+",
+        choices=["logan", "ma1", "1tcm", "2tcm"],
+        dest="models",
+        help="Kinetic model(s) to fit",
+    )
+    g_kin.add_argument(
+        "--blood-derivatives",
+        dest="blood_derivatives",
+        default="bloodstream",
+        help="Derivatives dataset containing blood data",
+    )
+    g_kin.add_argument("--tstar", type=float, help="t* for linear models (min)")
+    g_kin.add_argument(
+        "--vb-fixed", dest="vb_fixed", type=float, help="Fixed blood volume fraction"
+    )
+    g_kin.add_argument(
+        "--fit-end-time",
+        dest="fit_end_time",
+        type=float,
+        help="End time for nonlinear fits (min)",
+    )
+    g_kin.add_argument(
+        "--inpshift", type=float, default=0.0, help="Shift blood data in minutes"
+    )
+    g_kin.add_argument(
+        "--n-iterations",
+        dest="n_iterations",
+        type=int,
+        default=50,
+        help="Number of optimization iterations",
+    )
+    g_kin.add_argument(
+        "--save-figures", action="store_true", help="Save model fit figures"
+    )
+
     g_carbon = parser.add_argument_group('Options for carbon usage tracking')
     g_carbon.add_argument(
         '--track-carbon',
@@ -744,6 +782,23 @@ def parse_args(args=None, namespace=None):
         config.workflow.pvc_method = opts.pvc_method
     if opts.pvc_psf is not None:
         config.workflow.pvc_psf = tuple(opts.pvc_psf)
+
+    if opts.models is not None:
+        config.workflow.models = opts.models
+    if opts.blood_derivatives is not None:
+        config.workflow.blood_derivatives = opts.blood_derivatives
+    if opts.tstar is not None:
+        config.workflow.tstar = opts.tstar
+    if opts.vb_fixed is not None:
+        config.workflow.vb_fixed = opts.vb_fixed
+    if opts.fit_end_time is not None:
+        config.workflow.fit_end_time = opts.fit_end_time
+    if opts.inpshift is not None:
+        config.workflow.inpshift = opts.inpshift
+    if opts.n_iterations is not None:
+        config.workflow.n_iterations = opts.n_iterations
+    if opts.save_figures:
+        config.workflow.save_figures = True
 
     if not config.execution.notrack:
         import importlib.util

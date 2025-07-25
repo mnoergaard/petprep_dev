@@ -213,6 +213,15 @@ To run ``AGTM`` with ``petsurfer`` instead::
     $ petprep /data/bids_root /out participant \
         --pvc-tool petsurfer --pvc-method AGTM --pvc-psf 5
 
+Kinetic modeling
+----------------
+When blood input functions are available, PETPrep can directly fit pharmacokinetic
+models. Use ``--model`` to select one or more models (``logan``, ``ma1``, ``1tcm``,
+``2tcm``). Blood data are read from the derivatives dataset specified with
+``--blood-derivatives`` (default ``bloodstream``). Parameters such as ``--tstar``,
+``--vb-fixed``, ``--fit-end-time``, ``--inpshift``, ``--n-iterations`` and
+``--save-figures`` allow further customization of the fitting procedure.
+
 
 .. _cli_refmask:
 

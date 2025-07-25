@@ -613,6 +613,30 @@ class workflow(_Config):
     ref_mask_index: tuple | None = None
     """Tuple of label indices used to build the reference mask."""
 
+    models: list[str] | None = None
+    """Kinetic models to fit."""
+
+    blood_derivatives: str = "bloodstream"
+    """Name of derivatives dataset with blood data."""
+
+    tstar: float | None = None
+    """Start time (t*) for Logan and MA1 models."""
+
+    vb_fixed: float | None = None
+    """Fixed blood volume fraction for compartment models."""
+
+    fit_end_time: float | None = None
+    """End time for nonlinear model fitting."""
+
+    inpshift: float = 0.0
+    """Shift to apply to the input function (minutes)."""
+
+    n_iterations: int = 50
+    """Number of optimization iterations."""
+
+    save_figures: bool = False
+    """Save fit figures for each region."""
+
 
 class loggers:
     """Keep loggers easily accessible (see :py:func:`init`)."""

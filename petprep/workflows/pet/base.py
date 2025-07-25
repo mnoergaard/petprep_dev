@@ -723,6 +723,31 @@ Non-gridded (surface) resamplings were performed using `mri_vol2surf`
         (pet_tacs_wf, ds_pet_tacs, [('outputnode.timeseries', 'in_file')]),
     ])  # fmt:skip
 
+    if config.workflow.models:
+        blood_root = config.execution.derivatives.get(
+            config.workflow.blood_derivatives,
+            Path(config.workflow.blood_derivatives),
+        )
+        entities = extract_entities(pet_file)
+        blood_file = _blood_file_from_entities(Path(blood_root), entities)
+        from .kinmod import init_pet_kinmod_wf
+
+        pet_kinmod_wf = init_pet_kinmod_wf(
+            tacs_file="",
+            blood_file=str(blood_file),
+            models=config.workflow.models,
+        )
+
+        workflow.connect(
+            [
+                (
+                    pet_tacs_wf,
+                    pet_kinmod_wf,
+                    [("outputnode.timeseries", "inputnode.tacs_file")],
+                ),
+            ]
+        )
+
     if config.workflow.ref_mask_name:
         pet_ref_tacs_wf = init_pet_ref_tacs_wf(name='pet_ref_tacs_wf')
         pet_ref_tacs_wf.inputs.inputnode.metadata = str(
@@ -891,6 +916,18 @@ def extract_entities(file_list):
         return inlist
 
     return {k: _unique(v) for k, v in entities.items()}
+
+
+def _blood_file_from_entities(deriv_dir: Path, entities: dict) -> Path:
+    fname = f"sub-{entities['subject']}"
+    subdir = deriv_dir / f"sub-{entities['subject']}"
+    if "session" in entities:
+        fname += f"_ses-{entities['session']}"
+        subdir /= f"ses-{entities['session']}"
+    if "run" in entities:
+        fname += f"_run-{entities['run']}"
+    fname += "_inputfunction.tsv"
+    return subdir / "pet" / fname
 
 
 def _read_json(in_file):
