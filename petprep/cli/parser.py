@@ -224,6 +224,12 @@ def _build_parser(**kwargs):
         help='Path to a PyBIDS database folder, for faster indexing (especially '
         'useful for large datasets). Will be created if not present.',
     )
+    g_bids.add_argument(
+        '--blood-derivatives',
+        metavar='PATH',
+        type=Path,
+        help='Path to blood derivatives dataset (default: <bids_dir>/derivatives/bloodstream).',
+    )
 
     g_perfm = parser.add_argument_group('Options to handle performance')
     g_perfm.add_argument(
@@ -863,6 +869,8 @@ applied."""
             config.execution.petprep_dir = output_dir
         elif output_layout == 'legacy':
             config.execution.petprep_dir = output_dir / 'petprep'
+    if config.execution.blood_dir is None:
+        config.execution.blood_dir = bids_dir / 'derivatives' / 'bloodstream'
 
     # Wipe out existing work_dir
     if opts.clean_workdir and work_dir.exists():
