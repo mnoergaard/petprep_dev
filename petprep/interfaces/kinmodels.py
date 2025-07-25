@@ -15,6 +15,11 @@ from nipype.interfaces.base import (
     traits,
 )
 
+try:  # SciPy < 1.10
+    from scipy.integrate import cumtrapz  # type: ignore
+except ImportError:  # SciPy >= 1.10
+    from scipy.integrate import cumulative_trapezoid as cumtrapz  # type: ignore
+
 from .. import __version__
 from ..utils.kinmod import (
     load_blood,
@@ -79,7 +84,6 @@ class MA1Model(BaseBloodModel):
 
     def fit(self) -> dict:
         import statsmodels.api as sm
-        from scipy.integrate import cumtrapz
 
         tac_minutes = self.tac_times
         plasma_interp = np.interp(tac_minutes, self.plasma_times, self.plasma_values)
@@ -128,7 +132,6 @@ class MA1Model(BaseBloodModel):
 
     def visualize_fit(self, output_path: str, region_name: str) -> None:
         import matplotlib.pyplot as plt
-        from scipy.integrate import cumtrapz
 
         tac_minutes = self.tac_times
         plasma_interp = np.interp(tac_minutes, self.plasma_times, self.plasma_values)
@@ -201,7 +204,6 @@ class LoganModel(BaseBloodModel):
 
     def fit(self) -> dict:
         import statsmodels.api as sm
-        from scipy.integrate import cumtrapz
 
         tac_minutes = self.tac_times
         plasma_interp = np.interp(tac_minutes, self.plasma_times, self.plasma_values)
@@ -257,7 +259,6 @@ class LoganModel(BaseBloodModel):
     def visualize_fit(self, output_path: str, region_name: str) -> None:
         import matplotlib.pyplot as plt
         import statsmodels.api as sm
-        from scipy.integrate import cumtrapz
 
         tac_minutes = self.tac_times
         plasma_interp = np.interp(tac_minutes, self.plasma_times, self.plasma_values)
