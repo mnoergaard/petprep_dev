@@ -614,7 +614,10 @@ https://petprep.readthedocs.io/en/%s/spaces.html"""
     g_kin.add_argument(
         '--blood-derivatives',
         default='bloodstream',
-        help='Name of derivatives directory with blood data',
+        help=(
+            'Path or derivative name containing blood data '
+            '(e.g., --blood-derivatives /path/to/bloodstream)'
+        ),
     )
     g_kin.add_argument('--tstar', type=float, help='t* for linear models')
     g_kin.add_argument('--vb-fixed', type=float, help='Fixed blood volume fraction')

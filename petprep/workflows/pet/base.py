@@ -758,15 +758,13 @@ Non-gridded (surface) resamplings were performed using `mri_vol2surf`
 
     if config.workflow.models:
         entities = extract_entities(pet_file)
-        sub = entities['subject']
         blood_dir = config.execution.derivatives.get(config.workflow.blood_derivatives)
-        blood_path = Path(blood_dir) / f"sub-{sub}"
-        if 'session' in entities:
-            blood_path = blood_path / f"ses-{entities['session']}"
-            blood_fname = f"sub-{sub}_ses-{entities['session']}_inputfunction.tsv"
-        else:
-            blood_fname = f"sub-{sub}_inputfunction.tsv"
-        blood_file = blood_path / 'pet' / blood_fname
+        blood_file = _blood_file_from_entities(Path(blood_dir), entities)
+        if not Path(blood_file).is_file():
+            raise FileNotFoundError(
+                f"Blood data not found at {blood_file}. "
+                "Use --blood-derivatives to specify the dataset or path."
+            )
 
         kinmod_wf = init_pet_kinmod_wf(
             tacs_file='',

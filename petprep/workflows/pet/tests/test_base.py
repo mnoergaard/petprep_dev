@@ -290,3 +290,14 @@ def test_kinmod_wf_connected(bids_root: Path):
 
     edge = wf._graph.get_edge_data(wf.get_node('ds_pet_tacs'), wf.get_node('pet_kinmod_wf'))
     assert ('out_file', 'inputnode.tacs_file') in edge['connect']
+
+
+def test_missing_blood_file_raises(bids_root: Path, tmp_path: Path):
+    """Workflow should raise when blood data file is missing."""
+    pet_series = _prep_pet_series(bids_root)
+
+    with mock_config(bids_dir=bids_root):
+        config.execution.derivatives = {'bloodstream': tmp_path / 'bloodstream'}
+        config.workflow.models = ['logan']
+        with pytest.raises(FileNotFoundError):  # noqa: PT011
+            init_pet_wf(pet_series=pet_series, precomputed={})
