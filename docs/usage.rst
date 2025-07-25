@@ -215,12 +215,20 @@ To run ``AGTM`` with ``petsurfer`` instead::
 
 Kinetic modeling
 ----------------
-When blood input functions are available, PETPrep can directly fit pharmacokinetic
-models. Use ``--model`` to select one or more models (``logan``, ``ma1``, ``1tcm``,
-``2tcm``). Blood data are read from the derivatives dataset specified with
-``--blood-derivatives`` (default ``bloodstream``). Parameters such as ``--tstar``,
-``--vb-fixed``, ``--fit-end-time``, ``--inpshift``, ``--n-iterations`` and
-``--save-figures`` allow further customization of the fitting procedure.
+Regional time-activity curves can be further analyzed with kinetic models.
+Use ``--model`` to select one or more models (``logan``, ``ma1``, ``1tcm`` or
+``2tcm``). Blood activity curves are read from the derivatives directory
+specified with ``--blood-derivatives`` (default: ``bloodstream``).
+Additional parameters include ``--tstar`` for linear models, ``--vb-fixed`` and
+``--fit-end-time`` for compartment models, ``--inpshift`` to shift the plasma
+input function, ``--n-iterations`` to control optimization and ``--save-figures``
+to store fit plots.
+
+For example::
+
+    $ petprep /data/bids_root /out participant \
+        --model logan ma1 --blood-derivatives bloodstream \
+        --tstar 20 --save-figures
 
 
 .. _cli_refmask:

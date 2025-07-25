@@ -54,6 +54,7 @@ from .outputs import (
 )
 from .pvc import init_pet_pvc_wf
 from .ref_tacs import init_pet_ref_tacs_wf
+from .kinmod import init_pet_kinmod_wf
 from .resampling import init_pet_surf_wf
 from .tacs import init_pet_tacs_wf
 
@@ -723,31 +724,6 @@ Non-gridded (surface) resamplings were performed using `mri_vol2surf`
         (pet_tacs_wf, ds_pet_tacs, [('outputnode.timeseries', 'in_file')]),
     ])  # fmt:skip
 
-    if config.workflow.models:
-        blood_root = config.execution.derivatives.get(
-            config.workflow.blood_derivatives,
-            Path(config.workflow.blood_derivatives),
-        )
-        entities = extract_entities(pet_file)
-        blood_file = _blood_file_from_entities(Path(blood_root), entities)
-        from .kinmod import init_pet_kinmod_wf
-
-        pet_kinmod_wf = init_pet_kinmod_wf(
-            tacs_file="",
-            blood_file=str(blood_file),
-            models=config.workflow.models,
-        )
-
-        workflow.connect(
-            [
-                (
-                    pet_tacs_wf,
-                    pet_kinmod_wf,
-                    [("outputnode.timeseries", "inputnode.tacs_file")],
-                ),
-            ]
-        )
-
     if config.workflow.ref_mask_name:
         pet_ref_tacs_wf = init_pet_ref_tacs_wf(name='pet_ref_tacs_wf')
         pet_ref_tacs_wf.inputs.inputnode.metadata = str(
@@ -778,6 +754,35 @@ Non-gridded (surface) resamplings were performed using `mri_vol2surf`
             (pet_t1w_src, pet_ref_tacs_wf, [(pet_t1w_field, 'inputnode.pet_anat')]),
             (pet_fit_wf, pet_ref_tacs_wf, [('outputnode.refmask', 'inputnode.mask_file')]),
             (pet_ref_tacs_wf, ds_ref_tacs, [('outputnode.timeseries', 'in_file')]),
+        ])  # fmt:skip
+
+    if config.workflow.models:
+        entities = extract_entities(pet_file)
+        sub = entities['subject']
+        blood_dir = config.execution.derivatives.get(config.workflow.blood_derivatives)
+        blood_path = Path(blood_dir) / f"sub-{sub}"
+        if 'session' in entities:
+            blood_path = blood_path / f"ses-{entities['session']}"
+            blood_fname = f"sub-{sub}_ses-{entities['session']}_inputfunction.tsv"
+        else:
+            blood_fname = f"sub-{sub}_inputfunction.tsv"
+        blood_file = blood_path / 'pet' / blood_fname
+
+        kinmod_wf = init_pet_kinmod_wf(
+            tacs_file='',
+            blood_file=str(blood_file),
+            models=config.workflow.models,
+            tstar=config.workflow.tstar,
+            vb_fixed=config.workflow.vb_fixed,
+            fit_end_time=config.workflow.fit_end_time,
+            inpshift=config.workflow.inpshift,
+            n_iterations=config.workflow.n_iterations,
+            save_figures=config.workflow.save_figures,
+            name='pet_kinmod_wf',
+        )
+
+        workflow.connect([
+            (ds_pet_tacs, kinmod_wf, [('out_file', 'inputnode.tacs_file')]),
         ])  # fmt:skip
 
     pet_confounds_wf = init_pet_confs_wf(

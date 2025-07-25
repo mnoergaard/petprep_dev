@@ -614,28 +614,28 @@ class workflow(_Config):
     """Tuple of label indices used to build the reference mask."""
 
     models: list[str] | None = None
-    """Kinetic models to fit."""
+    """Kinetic models to fit (``logan``, ``ma1``, ``1tcm``, ``2tcm``)."""
 
-    blood_derivatives: str = "bloodstream"
-    """Name of derivatives dataset with blood data."""
+    blood_derivatives: str = 'bloodstream'
+    """Name of derivatives folder containing blood data."""
 
     tstar: float | None = None
-    """Start time (t*) for Logan and MA1 models."""
+    """t* value for linear kinetic models."""
 
     vb_fixed: float | None = None
     """Fixed blood volume fraction for compartment models."""
 
     fit_end_time: float | None = None
-    """End time for nonlinear model fitting."""
+    """End time in minutes for compartment model fitting."""
 
-    inpshift: float = 0.0
-    """Shift to apply to the input function (minutes)."""
+    inpshift: float | None = None
+    """Shift plasma input curve by this amount (minutes)."""
 
     n_iterations: int = 50
-    """Number of optimization iterations."""
+    """Number of optimization iterations for model fitting."""
 
     save_figures: bool = False
-    """Save fit figures for each region."""
+    """Store diagnostic figures for model fits."""
 
 
 class loggers:

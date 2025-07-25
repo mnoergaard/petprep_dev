@@ -11,7 +11,19 @@ from ... import config
 from ...interfaces import DerivativesDataSink, FitKineticModel
 
 
-def init_pet_kinmod_wf(*, tacs_file: str, blood_file: str, models: list[str], name: str = "pet_kinmod_wf") -> pe.Workflow:
+def init_pet_kinmod_wf(
+    *,
+    tacs_file: str,
+    blood_file: str,
+    models: list[str],
+    tstar: float | None = None,
+    vb_fixed: float | None = None,
+    fit_end_time: float | None = None,
+    inpshift: float | None = None,
+    n_iterations: int | None = None,
+    save_figures: bool = False,
+    name: str = "pet_kinmod_wf",
+) -> pe.Workflow:
     """Fit kinetic models from regional TACs and blood data."""
     workflow = pe.Workflow(name=name)
 
@@ -29,6 +41,18 @@ def init_pet_kinmod_wf(*, tacs_file: str, blood_file: str, models: list[str], na
 
     for model in models:
         fit = pe.Node(FitKineticModel(model=model), name=f"fit_{model}")
+        if tstar is not None and model in {"logan", "ma1"}:
+            fit.inputs.t_star = tstar
+        if vb_fixed is not None and model in {"1tcm", "2tcm"}:
+            fit.inputs.vB_fixed = vb_fixed
+        if fit_end_time is not None and model in {"1tcm", "2tcm"}:
+            fit.inputs.fit_end_time = fit_end_time
+        if inpshift is not None and model == "2tcm":
+            fit.inputs.inpshift = inpshift
+        if n_iterations is not None:
+            fit.inputs.n_iterations = n_iterations
+        if save_figures:
+            fit.inputs.save_figures = True
 
         ds_params = pe.Node(
             DerivativesDataSink(

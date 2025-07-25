@@ -603,43 +603,25 @@ https://petprep.readthedocs.io/en/%s/spaces.html"""
         help='Point spread function FWHM (one value or three values)',
     )
 
-    g_kin = parser.add_argument_group("Kinetic modeling options")
+    g_kin = parser.add_argument_group('Kinetic modeling options')
     g_kin.add_argument(
-        "--model",
-        nargs="+",
-        choices=["logan", "ma1", "1tcm", "2tcm"],
-        dest="models",
-        help="Kinetic model(s) to fit",
+        '--model',
+        dest='models',
+        nargs='+',
+        choices=['logan', 'ma1', '1tcm', '2tcm'],
+        help='Kinetic model(s) to fit',
     )
     g_kin.add_argument(
-        "--blood-derivatives",
-        dest="blood_derivatives",
-        default="bloodstream",
-        help="Derivatives dataset containing blood data",
+        '--blood-derivatives',
+        default='bloodstream',
+        help='Name of derivatives directory with blood data',
     )
-    g_kin.add_argument("--tstar", type=float, help="t* for linear models (min)")
-    g_kin.add_argument(
-        "--vb-fixed", dest="vb_fixed", type=float, help="Fixed blood volume fraction"
-    )
-    g_kin.add_argument(
-        "--fit-end-time",
-        dest="fit_end_time",
-        type=float,
-        help="End time for nonlinear fits (min)",
-    )
-    g_kin.add_argument(
-        "--inpshift", type=float, default=0.0, help="Shift blood data in minutes"
-    )
-    g_kin.add_argument(
-        "--n-iterations",
-        dest="n_iterations",
-        type=int,
-        default=50,
-        help="Number of optimization iterations",
-    )
-    g_kin.add_argument(
-        "--save-figures", action="store_true", help="Save model fit figures"
-    )
+    g_kin.add_argument('--tstar', type=float, help='t* for linear models')
+    g_kin.add_argument('--vb-fixed', type=float, help='Fixed blood volume fraction')
+    g_kin.add_argument('--fit-end-time', type=float, help='End time for fitting (minutes)')
+    g_kin.add_argument('--inpshift', type=float, help='Plasma input temporal shift (minutes)')
+    g_kin.add_argument('--n-iterations', type=int, help='Number of optimization iterations')
+    g_kin.add_argument('--save-figures', action='store_true', help='Save model fit plots')
 
     g_carbon = parser.add_argument_group('Options for carbon usage tracking')
     g_carbon.add_argument(

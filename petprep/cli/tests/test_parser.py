@@ -308,40 +308,42 @@ def test_reference_mask_options(tmp_path, minimal_bids, monkeypatch):
 
 
 def test_kinmod_arguments(tmp_path, minimal_bids):
-    out_dir = tmp_path / "out"
-    work_dir = tmp_path / "work"
+    out_dir = tmp_path / 'out'
+    work_dir = tmp_path / 'work'
+
     parse_args(
         args=[
             str(minimal_bids),
             str(out_dir),
-            "participant",
-            "-w",
+            'participant',
+            '-w',
             str(work_dir),
-            "--skip-bids-validation",
-            "--model",
-            "logan",
-            "ma1",
-            "--blood-derivatives",
-            "bloodstream",
-            "--tstar",
-            "10",
-            "--vb-fixed",
-            "0.05",
-            "--fit-end-time",
-            "60",
-            "--inpshift",
-            "5",
-            "--n-iterations",
-            "1",
-            "--save-figures",
+            '--skip-bids-validation',
+            '--model',
+            'logan',
+            'ma1',
+            '--blood-derivatives',
+            'bloodstream',
+            '--tstar',
+            '20',
+            '--vb-fixed',
+            '0.05',
+            '--fit-end-time',
+            '60',
+            '--inpshift',
+            '2',
+            '--n-iterations',
+            '10',
+            '--save-figures',
         ]
     )
-    assert config.workflow.models == ["logan", "ma1"]
-    assert config.workflow.blood_derivatives == "bloodstream"
-    assert config.workflow.tstar == 10.0
+
+    assert config.workflow.models == ['logan', 'ma1']
+    assert config.workflow.blood_derivatives == 'bloodstream'
+    assert config.workflow.tstar == 20.0
     assert config.workflow.vb_fixed == 0.05
     assert config.workflow.fit_end_time == 60.0
-    assert config.workflow.inpshift == 5.0
-    assert config.workflow.n_iterations == 1
+    assert config.workflow.inpshift == 2.0
+    assert config.workflow.n_iterations == 10
     assert config.workflow.save_figures is True
     _reset_config()

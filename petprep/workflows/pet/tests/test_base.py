@@ -6,7 +6,7 @@ import pytest
 from nipype.pipeline.engine.utils import generate_expanded_graph
 from niworkflows.utils.testing import generate_bids_skeleton
 
-from .... import config
+from .... import config, data
 from ...tests import mock_config
 from ...tests.test_base import BASE_LAYOUT
 from ..base import init_pet_wf
@@ -276,19 +276,17 @@ def test_psf_metadata_propagation(bids_root: Path):
     assert ('meta_dict', 'meta_dict') in edge_ds['connect']
 
 
-def test_pet_wf_with_kinmod(bids_root: Path):
-    """Kinetic modeling workflow is added when models are requested."""
+def test_kinmod_wf_connected(bids_root: Path):
+    """Kinetic modeling workflow should be included when models are specified."""
     pet_series = _prep_pet_series(bids_root)
-
-    blood_root = data.load("tests/ds000005/derivatives/bloodstream").absolute()
+    deriv_root = data.load('tests/ds000005/derivatives').absolute()
 
     with mock_config(bids_dir=bids_root):
-        config.workflow.models = ["logan"]
-        config.execution.derivatives = {"bloodstream": blood_root}
+        config.execution.derivatives = {'bloodstream': deriv_root / 'bloodstream'}
+        config.workflow.models = ['logan']
         wf = init_pet_wf(pet_series=pet_series, precomputed={})
 
-    assert any(n.startswith("pet_kinmod_wf") for n in wf.list_node_names())
-    edge = wf._graph.get_edge_data(
-        wf.get_node("pet_tacs_wf"), wf.get_node("pet_kinmod_wf")
-    )
-    assert ("outputnode.timeseries", "inputnode.tacs_file") in edge["connect"]
+    assert any(n.startswith('pet_kinmod_wf') for n in wf.list_node_names())
+
+    edge = wf._graph.get_edge_data(wf.get_node('ds_pet_tacs'), wf.get_node('pet_kinmod_wf'))
+    assert ('out_file', 'inputnode.tacs_file') in edge['connect']
