@@ -1,23 +1,33 @@
 import json
-from pathlib import Path
 
 import pandas as pd
-import pytest
 
 from petprep import data
 from petprep.utils.kinmod import (
-    load_tacs,
     load_blood,
-    save_kinpar_tsv,
+    load_tacs,
     save_kinpar_json,
+    save_kinpar_tsv,
 )
 
 DERIV_DIR = data.load('tests/ds000005/derivatives').absolute()
 
 
 def test_load_tacs_and_blood():
-    tacs_file = DERIV_DIR / 'petprep' / 'sub-01' / 'pet' / 'sub-01_desc-preproc_seg-gtm_timeseries.tsv'
-    blood_file = DERIV_DIR / 'bloodstream' / 'sub-01' / 'pet' / 'sub-01_inputfunction.tsv'
+    tacs_file = (
+        DERIV_DIR
+        / 'petprep'
+        / 'sub-01'
+        / 'pet'
+        / 'sub-01_desc-preproc_seg-gtm_timeseries.tsv'
+    )
+    blood_file = (
+        DERIV_DIR
+        / 'bloodstream'
+        / 'sub-01'
+        / 'pet'
+        / 'sub-01_inputfunction.tsv'
+    )
 
     tacs = load_tacs(tacs_file)
     blood = load_blood(blood_file)
@@ -35,8 +45,20 @@ def test_load_tacs_and_blood():
 
 
 def test_save_kinpar_roundtrip(tmp_path):
-    tsv_file = DERIV_DIR / 'petprep' / 'sub-01' / 'pet' / 'sub-01_seg-gtm_model-1tcm_kinpar.tsv'
-    json_file = DERIV_DIR / 'petprep' / 'sub-01' / 'pet' / 'sub-01_seg-gtm_model-1tcm_kinpar.json'
+    tsv_file = (
+        DERIV_DIR
+        / 'petprep'
+        / 'sub-01'
+        / 'pet'
+        / 'sub-01_seg-gtm_model-1tcm_kinpar.tsv'
+    )
+    json_file = (
+        DERIV_DIR
+        / 'petprep'
+        / 'sub-01'
+        / 'pet'
+        / 'sub-01_seg-gtm_model-1tcm_kinpar.json'
+    )
 
     df = pd.read_csv(tsv_file, sep='\t')
     out_tsv = save_kinpar_tsv(df, tmp_path / 'kinpar.tsv')
