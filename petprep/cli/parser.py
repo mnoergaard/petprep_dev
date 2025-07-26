@@ -867,6 +867,13 @@ applied."""
             config.execution.petprep_dir = output_dir
         elif output_layout == 'legacy':
             config.execution.petprep_dir = output_dir / 'petprep'
+    if config.execution.blood_dir is None:
+        config.execution.blood_dir = bids_dir / 'derivatives' / 'bloodstream'
+
+    if config.workflow.blood_derivatives not in config.execution.derivatives:
+        config.execution.derivatives[config.workflow.blood_derivatives] = (
+            config.execution.blood_dir
+        )
 
     # Wipe out existing work_dir
     if opts.clean_workdir and work_dir.exists():
