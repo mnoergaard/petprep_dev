@@ -219,9 +219,7 @@ Regional time-activity curves can be further analyzed with kinetic models.
 Use ``--model`` to select one or more models (``logan``, ``ma1``, ``1tcm`` or
 ``2tcm``). Blood activity curves are read from the directory indicated with
 ``--blood-derivatives`` (default: ``bloodstream``). This option accepts either
-a path or the name of a derivative supplied via ``--derivatives``. If no
-``--derivatives`` argument is provided, PETPrep will automatically search the
-``bloodstream`` directory under ``<bids_dir>/derivatives``.
+a path or the name of a derivative supplied via ``--derivatives``.
 Additional parameters include ``--tstar`` for linear models, ``--vb-fixed`` and
 ``--fit-end-time`` for compartment models, ``--inpshift`` to shift the plasma
 input function, ``--n-iterations`` to control optimization and ``--save-figures``
