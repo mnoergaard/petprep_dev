@@ -158,6 +158,26 @@ def test_parse_args(tmp_path, minimal_bids):
     _reset_config()
 
 
+def test_blood_dir_defaults(tmp_path, minimal_bids):
+    out_dir = tmp_path / 'out'
+    work_dir = tmp_path / 'work'
+
+    parse_args(
+        args=[
+            str(minimal_bids),
+            str(out_dir),
+            'participant',
+            '-w',
+            str(work_dir),
+            '--skip-bids-validation',
+        ]
+    )
+
+    assert config.execution.blood_dir == minimal_bids / 'derivatives' / 'bloodstream'
+    assert config.execution.derivatives['bloodstream'] == config.execution.blood_dir
+    _reset_config()
+
+
 def test_bids_filter_file(tmp_path, capsys):
     bids_path = tmp_path / 'data'
     out_path = tmp_path / 'out'
@@ -346,4 +366,76 @@ def test_kinmod_arguments(tmp_path, minimal_bids):
     assert config.workflow.inpshift == 2.0
     assert config.workflow.n_iterations == 10
     assert config.workflow.save_figures is True
+    _reset_config()
+
+
+def test_blood_derivatives_path(tmp_path, minimal_bids):
+    """Providing a path to blood derivatives should populate execution settings."""
+    out_dir = tmp_path / 'out'
+    work_dir = tmp_path / 'work'
+    blood_dir = tmp_path / 'blood'
+    blood_dir.mkdir()
+
+    parse_args(
+        args=[
+            str(minimal_bids),
+            str(out_dir),
+            'participant',
+            '-w',
+            str(work_dir),
+            '--skip-bids-validation',
+            '--blood-derivatives',
+            str(blood_dir),
+        ]
+    )
+
+    assert config.workflow.blood_derivatives == 'bloodstream'
+    assert config.execution.derivatives['bloodstream'] == blood_dir
+    _reset_config()
+
+
+def test_workflow_with_blood_path(tmp_path, minimal_bids):
+    """Workflow should initialize when a blood derivatives path is given."""
+    out_dir = tmp_path / 'out'
+    work_dir = tmp_path / 'work'
+    blood_dir = tmp_path / 'blood'
+    blood_file = blood_dir / 'sub-01' / 'pet' / 'sub-01_run-1_inputfunction.tsv'
+    blood_file.parent.mkdir(parents=True)
+    blood_file.write_text('time\tactivity\n0\t0')
+
+    def _make_pet_series(root):
+        pet_file = root / 'sub-01' / 'pet' / 'sub-01_task-rest_run-1_pet.nii.gz'
+        pet_file.parent.mkdir(parents=True, exist_ok=True)
+        import nibabel as nb
+        import numpy as np
+
+        img = nb.Nifti1Image(np.zeros((10, 10, 10, 10)), np.eye(4))
+        img.to_filename(pet_file)
+        sidecar = pet_file.with_suffix('').with_suffix('.json')
+        sidecar.write_text('{"FrameTimesStart": [0], "FrameDuration": [1]}')
+        return [str(pet_file)]
+
+    pet_series = _make_pet_series(minimal_bids)
+
+    parse_args(
+        args=[
+            str(minimal_bids),
+            str(out_dir),
+            'participant',
+            '-w',
+            str(work_dir),
+            '--skip-bids-validation',
+            '--model',
+            'logan',
+            '--blood-derivatives',
+            str(blood_dir),
+        ]
+    )
+
+    config.execution.output_spaces = 'T1w'
+    config.init_spaces()
+
+    from petprep.workflows.pet.base import init_pet_wf
+    wf = init_pet_wf(pet_series=pet_series, precomputed={})
+    assert any(n.startswith('pet_kinmod_wf') for n in wf.list_node_names())
     _reset_config()

@@ -227,7 +227,7 @@ def _build_parser(**kwargs):
     g_bids.add_argument(
         '--blood-derivatives',
         metavar='PATH',
-        type=Path,
+        type=str,
         help='Path to blood derivatives dataset (default: <bids_dir>/derivatives/bloodstream).',
     )
 
@@ -733,6 +733,7 @@ discourage its usage.""",
 def parse_args(args=None, namespace=None):
     """Parse args and run further checks on the command line."""
     import logging
+    from pathlib import Path
 
     from niworkflows.utils.spaces import Reference, SpatialReferences
 
@@ -769,7 +770,12 @@ def parse_args(args=None, namespace=None):
     if opts.models is not None:
         config.workflow.models = opts.models
     if opts.blood_derivatives is not None:
-        config.workflow.blood_derivatives = opts.blood_derivatives
+        _blood_path = Path(opts.blood_derivatives)
+        if _blood_path.is_dir():
+            config.execution.derivatives['bloodstream'] = _blood_path
+            config.workflow.blood_derivatives = 'bloodstream'
+        else:
+            config.workflow.blood_derivatives = str(opts.blood_derivatives)
     if opts.tstar is not None:
         config.workflow.tstar = opts.tstar
     if opts.vb_fixed is not None:
@@ -863,6 +869,11 @@ applied."""
             config.execution.petprep_dir = output_dir / 'petprep'
     if config.execution.blood_dir is None:
         config.execution.blood_dir = bids_dir / 'derivatives' / 'bloodstream'
+
+    if config.workflow.blood_derivatives not in config.execution.derivatives:
+        config.execution.derivatives[config.workflow.blood_derivatives] = (
+            config.execution.blood_dir
+        )
 
     # Wipe out existing work_dir
     if opts.clean_workdir and work_dir.exists():
