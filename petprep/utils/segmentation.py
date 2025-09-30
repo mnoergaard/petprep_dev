@@ -172,7 +172,30 @@ def ctab_to_dsegtsv(ctab_file: str) -> str:
     import pandas as pd
 
     ctab_file = Path(ctab_file)
-    df = pd.read_csv(ctab_file, header=None, sep=r'\s+', usecols=[0, 1], names=['index', 'name'])
+    df = pd.read_csv(
+        ctab_file,
+        header=None,
+        comment='#',
+        sep=r'\s+',
+        engine='python',
+        dtype=str,
+    ).dropna(how='all')
+
+    if df.empty:
+        raise ValueError(f'No entries found in {ctab_file}')
+
+    name_col = None
+    for col in df.columns[1:]:
+        series = df[col].dropna().astype(str)
+        if not series.empty and any(_not_number(token) for token in series):
+            name_col = col
+            break
+
+    if name_col is None:
+        raise ValueError(f'Could not identify name column in {ctab_file}')
+
+    index_series = pd.to_numeric(df.iloc[:, 0], errors='raise')
+    df = pd.DataFrame({'index': index_series, 'name': df[name_col].astype(str)})
     out_file = ctab_file.with_suffix('.tsv')
     df.to_csv(out_file, sep='\t', index=False)
     return str(out_file)
