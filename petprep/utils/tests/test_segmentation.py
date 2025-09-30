@@ -1,3 +1,6 @@
+from importlib import resources
+from pathlib import Path
+
 import pandas as pd
 
 from ..segmentation import (
@@ -51,3 +54,18 @@ def test_ctab_to_dsegtsv(tmp_path):
     out = ctab_to_dsegtsv(ctab)
     df = pd.read_csv(out, sep='\t')
     assert list(df.columns) == ['index', 'name']
+
+
+def test_ctab_to_dsegtsv_hippocampus_table(tmp_path):
+    hippocampus_ctab = (
+        resources.files('petprep.data.segmentation') / 'hippocampus.txt'
+    )
+    ctab_copy = tmp_path / 'hippocampus.txt'
+    ctab_copy.write_bytes(hippocampus_ctab.read_bytes())
+
+    out = Path(ctab_to_dsegtsv(ctab_copy))
+    df = pd.read_csv(out, sep='\t')
+
+    lookup = dict(zip(df['index'], df['name'], strict=False))
+    assert lookup[7001] == 'Lateral-nucleus'
+    assert lookup[7015] == 'Paralaminar-nucleus'
